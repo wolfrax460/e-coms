@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign In — ShopEasy</title>
+<style>
+  body{margin:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#c3e0f2 100%);display:flex;justify-content:center;align-items:center;min-height:100vh;}
+  .card{background:white;padding:30px 40px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.1);width:100%;max-width:400px;}
+  h2{text-align:center;margin-bottom:25px;color:#333;font-size:24px;font-weight:600;}
+  .row{margin-bottom:18px;}
+  label{display:block;margin-bottom:6px;color:#444;font-weight:500;font-size:14px;}
+  input{width:100%;padding:12px 14px;border:1px solid #ddd;border-radius:8px;font-size:15px;}
+  input:focus{outline:none;border-color:#5c6bc0;box-shadow:0 0 0 3px rgba(92,107,192,0.2);}
+  .error{color:#e74c3c;font-size:13px;margin-top:5px;min-height:18px;}
+  input[type=submit]{background:#5c6bc0;color:white;border:none;padding:12px 20px;font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;width:100%;transition:background 0.3s;}
+  input[type=submit]:hover{background:#3f51b5;}
+  p.muted{text-align:center;font-size:14px;color:#666;margin-top:10px;}
+</style>
+</head>
+<body>
+<form id="signinForm" class="card" onsubmit="return handleSignIn(event)">
+  <h2>Sign In</h2>
+  <div class="row">
+    <label>Email Address</label>
+    <input id="email" type="email" required>
+    <div class="error" id="emailErr"></div>
+  </div>
+  <div class="row">
+    <label>Password</label>
+    <input id="password" type="password" required minlength="4">
+    <div class="error" id="passwordErr"></div>
+  </div>
+  <div class="row">
+    <input type="submit" value="Sign In">
+  </div>
+  <p class="muted">Don't have an account? <a href="register.html">Register</a></p>
+</form>
+<script>
+function handleSignIn(e){
+  e.preventDefault();
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
+  const users=JSON.parse(localStorage.getItem('users')||'[]');
+  const user=users.find(u=>u.email===email && u.password===password);
+  document.getElementById('emailErr').textContent='';
+  document.getElementById('passwordErr').textContent='';
+  if(!user){
+    document.getElementById('passwordErr').textContent='Email or password incorrect.';
+    return false;
+  }
+  localStorage.setItem('session',JSON.stringify({email:user.email,name:user.name||''}));
+  location.href='index.html';
+  return true;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopEasy — Product Details</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #222;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 22px;
+    text-decoration: none;
+    color: #333;
+  }
+
+  nav {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    padding: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  img {
+    width: 100%;
+    max-width: 380px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f9f9f9;
+  }
+
+  .details {
+    flex: 1;
+    min-width: 260px;
+  }
+
+  h1 {
+    margin-top: 0;
+    font-size: 24px;
+  }
+
+  .price {
+    font-size: 20px;
+    color: #3f51b5;
+    font-weight: 700;
+  }
+
+  .muted {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .btn {
+    background: #5c6bc0;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 12px;
+    display: inline-block;
+  }
+
+  .btn:hover {
+    background: #3f51b5;
+  }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    margin-top: 32px;
+    color: #555;
+    font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    main { flex-direction: column; align-items: center; text-align: center; }
+    img { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">ShopEasy</a>
+  <nav>
+    <a href="cart.html">Cart (<span id="cartCount">0</span>)</a>
+    <a href="signin.html">Sign In</a>
+  </nav>
+</header>
+
+<main>
+  <img id="productImage" src="" alt="">
+  <div class="details">
+    <h1 id="productTitle"></h1>
+    <p class="muted" id="productCategory"></p>
+    <p class="price" id="productPrice"></p>
+    <p id="productDescription"></p>
+    <button id="addToCart" class="btn">Add to Cart</button>
+  </div>
+</main>
+
+<footer>© <span id="year"></span> ShopEasy — Demo Front-End E-commerce</footer>
+
+<script>
+const PRODUCTS = [
+  { id: 1, title: 'Asics Running Shoes', price: 82000, category: 'Shoes', rating: 4.5, description: 'Lightweight running shoes for comfort and speed.', image: 'asics.png' },
+  { id: 2, title: 'Wireless Headphones', price: 75000, category: 'Electronics', rating: 4.7, description: 'High-quality over-ear headphones with rich bass.', image: 'headphones.png' },
+  { id: 3, title: 'Classic Leather Wallet', price: 15000, category: 'Accessories', rating: 4.4, description: 'Premium leather wallet with multiple compartments.', image: 'wallet.png' },
+  { id: 4, title: 'Smart Watch', price: 120000, category: 'Electronics', rating: 4.3, description: 'Easy to use and tracks your heart rate and BPM', image: 'watch.png' },
+  {id: 5, title: 'Canvas Backpack', price: 42000, category:'Bags', rating: 4.9, description: 'Durable backpack with padded laptop sleeve.',image: 'backpack.png'},
+  { id: 6, title: 'Vanilla Perfume', price: 8000, category: 'Fragrance', rating: 4.6, description: 'Soft vanilla scent that lasts all day.', image: 'vanilla.png' },
+  {id: 7, title: 'Flipper Zero', price:200000, category: 'Electronics', rating: 4.9, description: 'This used in hacking RFID cards', image: 'flipper.png'}
+];
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const params = new URLSearchParams(window.location.search);
+const id = parseInt(params.get('id'), 10);
+const product = PRODUCTS.find(p => p.id === id);
+
+if (product) {
+  document.getElementById('productImage').src = product.image;
+  document.getElementById('productImage').alt = product.title;
+  document.getElementById('productTitle').textContent = product.title;
+  document.getElementById('productCategory').textContent = `${product.category} • Rating: ${product.rating}`;
+  document.getElementById('productPrice').textContent = `RWF ${product.price.toLocaleString()}`;
+  document.getElementById('productDescription').textContent = product.description;
+} else {
+  document.querySelector('main').innerHTML = '<p>Product not found.</p>';
+}
+
+document.getElementById('addToCart').addEventListener('click', () => {
+  if (!product) return;
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(i => i.id === product.id);
+  if (existing) existing.qty++;
+  else cart.push({ id: product.id, qty: 1 });
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  alert('Product added to cart');
+});
+
+function updateCartCount() {
+  const count = JSON.parse(localStorage.getItem('cart') || '[]').reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cartCount').textContent = count;
+}
+
+updateCartCount();
+</script>
+</body>
+</html>

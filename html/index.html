@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShopEasy — Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #222;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 22px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    nav {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    nav input {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .product {
+      background: white;
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(10, 10, 20, 0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+
+    .product h3 {
+      font-size: 18px;
+      margin: 10px 0 6px 0;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .price {
+      font-weight: 700;
+      font-size: 16px;
+      margin: 6px 0;
+      color: #3f51b5;
+    }
+
+    .btn {
+      background: #5c6bc0;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      display: inline-block;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      background: #3f51b5;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .filters {
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    footer {
+      text-align: center;
+      padding: 16px;
+      margin-top: 32px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">ShopEasy</a>
+    <nav>
+      <input id="searchInput" type="search" placeholder="Search products...">
+      <a href="cart.html">Cart (<span id="cartCount">0</span>)</a>
+      <a href="signin.html">Sign In</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="filters">
+      <label>Category:
+        <select id="categoryFilter"><option value="all">All</option></select>
+      </label>
+      <label>Sort by:
+        <select id="sortSelect">
+          <option value="default">Default</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating-desc">Rating: High to Low</option>
+        </select>
+      </label>
+    </section>
+
+    <section id="products" class="products-grid"></section>
+  </main>
+
+  <footer>© <span id="year"></span> ShopEasy — Demo Front-End E-commerce</footer>
+
+  <script>
+    /* ---------- PRODUCT DATA ---------- */
+    const PRODUCTS = [
+      { id: 1, title: 'Asics Running Shoes', price: 82000, category: 'Shoes', rating: 4.5,
+        description: 'Lightweight running shoes for comfort and speed.',
+        image: 'asics.png' },
+
+      { id: 2, title: 'Wireless Headphones', price: 75000, category: 'Electronics', rating: 4.7,
+        description: 'High-quality over-ear headphones with rich bass.',
+        image: 'headphones.png' },
+
+      { id: 3, title: 'Classic Leather Wallet', price: 15000, category: 'Accessories', rating: 4.4,
+        description: 'Premium leather wallet with multiple compartments.',
+        image: 'wallet.png' },
+
+      { id: 4, title: ' Smart Watch', price: 120000, category: 'Electronics', rating: 4.4,
+        description: 'Easy to use and used in measuring heart beat.',
+        image: 'watch.png' },
+
+      { id: 5, title: 'Canvas Backpack', price: 42000, category: 'Bags', rating: 4.3,
+        description: 'Durable backpack with padded laptop sleeve.',
+        image: 'backPack.png' },
+
+      { id: 6, title: 'Vanilla Perfume', price: 8000, category: 'Fragrance', rating: 4.6,
+        description: 'Soft vanilla scent that lasts all day.',
+        image: 'vanilla.png' },
+        { id:7, title:'Flipper Zero', price: 200000, category: 'electronics', rating: 4.9, description: 'this is a powerful tool in hacking.', image: 'flipper.png'}
+    ];
+
+    /* ---------- INITIAL SETUP ---------- */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const productsEl      = document.getElementById('products');
+    const search          = document.getElementById('searchInput');
+    const categorySelect  = document.getElementById('categoryFilter');
+    const sortSelect      = document.getElementById('sortSelect');
+
+    /* Populate category filter */
+    [...new Set(PRODUCTS.map(p => p.category))].forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      categorySelect.appendChild(opt);
+    });
+
+    /* ---------- RENDER PRODUCTS ---------- */
+    function render(list) {
+      productsEl.innerHTML = '';
+      list.forEach(p => {
+        const el = document.createElement('article');
+        el.className = 'product';
+        el.innerHTML = `
+          <img src="${p.image}"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGVkZWJlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='"
+               alt="${p.title}">
+          <h3>${p.title}</h3>
+          <p class="muted">${p.category} • Rating: ${p.rating}</p>
+          <p class="price">RWF ${p.price.toLocaleString()}</p>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <a class="btn" href="product.html?id=${p.id}">View</a>
+            <button class="btn add" data-id="${p.id}">Add to cart</button>
+          </div>
+        `;
+        productsEl.appendChild(el);
+      });
+
+      document.querySelectorAll('.add').forEach(btn => btn.addEventListener('click', e => {
+        const id = parseInt(e.target.dataset.id, 10);
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const existing = cart.find(i => i.id === id);
+        if (existing) existing.qty++;
+        else cart.push({ id, qty: 1 });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        alert('Product added to cart');
+      }));
+    }
+
+    /* ---------- FILTER & SORT ---------- */
+    function filterAndRender() {
+      const q   = search.value.trim().toLowerCase();
+      const cat = categorySelect.value;
+      const sort = sortSelect.value;
+
+      let list = PRODUCTS.filter(p =>
+        (p.title + ' ' + p.description).toLowerCase().includes(q)
+      );
+
+      if (cat !== 'all') list = list.filter(p => p.category === cat);
+
+      if (sort === 'price-asc')  list.sort((a,b) => a.price - b.price);
+      if (sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+      if (sort === 'rating-desc') list.sort((a,b) => b.rating - a.rating);
+
+      render(list);
+    }
+
+    /* ---------- EVENT LISTENERS ---------- */
+    search.addEventListener('input', filterAndRender);
+    categorySelect.addEventListener('change', filterAndRender);
+    sortSelect.addEventListener('change', filterAndRender);
+
+    /* ---------- CART COUNT ---------- */
+    function updateCartCount() {
+      const count = JSON.parse(localStorage.getItem('cart') || '[]')
+                    .reduce((s,i) => s + i.qty, 0);
+      document.getElementById('cartCount').textContent = count;
+    }
+
+    /* ---------- INITIAL RENDER ---------- */
+    updateCartCount();
+    filterAndRender();
+  </script>
+</body>
+</html>
