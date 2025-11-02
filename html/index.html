@@ -6,10 +6,13 @@
   <link rel="icon" href="logo.ico" />
   <title>ShopEasy — Home</title>
 
+  <!-- Modern Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #222;
       overflow-x: hidden;
       min-height: 100vh;
@@ -88,10 +91,42 @@
       gap: 16px;
       align-items: center;
       flex-wrap: wrap;
-      background: rgba(192, 32, 184, 0.85);
+      background: rgba(241, 157, 237, 0.85);
       border-radius: 12px;
       padding: 8px 16px;
       backdrop-filter: blur(6px);
+    }
+
+    /* ✅ Modern label + select styling for filters */
+    .filters label {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 600;
+      color: #f5f5f5;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filters select {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #1e40af;
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #1a1a1a;
+      outline: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .filters select:hover,
+    .filters select:focus {
+      border-color: #6a5acd;
+      box-shadow: 0 0 8px rgba(106, 90, 205, 0.4);
+      background-color: #ffffff;
     }
 
     .products-grid {
@@ -99,7 +134,7 @@
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 16px;
     }
-
+   
     .product {
       background: rgba(13, 8, 8, 0.9);
       padding: 14px;
@@ -161,7 +196,7 @@
       text-align: center;
       padding: 16px;
       margin-top: 32px;
-      color: #fff;
+      color: #1e0d8c;
       font-size: 14px;
       position: relative;
       z-index: 1;
