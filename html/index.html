@@ -7,24 +7,32 @@
   <title>ShopEasy — Home</title>
 
   <style>
-    /* ---------- BODY & BACKGROUND ---------- */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #222;
       overflow-x: hidden;
-      position: relative;
       min-height: 100vh;
+      position: relative;
+      background: radial-gradient(circle at top left, #ff00cc, #3333ff);
+      animation: gradientShift 15s ease infinite alternate;
+      background-size: 200% 200%;
     }
 
-    /* Dynamic blob animation container */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     canvas#bgCanvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: -1;
-      background: linear-gradient(135deg, #496ca1 0%, #c3cfe2 100%);
-      filter: blur(30px);
+      mix-blend-mode: screen;
     }
 
     header {
@@ -101,8 +109,8 @@
     }
 
     .product:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 10px 30px rgba(10, 10, 20, 0.15);
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 12px 36px rgba(10, 10, 20, 0.25);
     }
 
     .product img {
@@ -131,7 +139,7 @@
     }
 
     .btn {
-      background: #5c6bc0;
+      background: linear-gradient(45deg, #6a5acd, #ff4081);
       color: white;
       border: none;
       padding: 8px 12px;
@@ -141,26 +149,26 @@
       text-align: center;
       display: inline-block;
       font-weight: 500;
+      transition: 0.3s;
     }
 
     .btn:hover {
-      background: #3f51b5;
+      background: linear-gradient(45deg, #ff4081, #6a5acd);
+      transform: scale(1.05);
     }
 
     footer {
       text-align: center;
       padding: 16px;
       margin-top: 32px;
-      color: #555;
+      color: #fff;
       font-size: 14px;
       position: relative;
       z-index: 1;
     }
 
     @media (max-width: 480px) {
-      .products-grid {
-        grid-template-columns: 1fr;
-      }
+      .products-grid { grid-template-columns: 1fr; }
     }
 
     img {
@@ -172,7 +180,6 @@
 </head>
 
 <body>
-  <!-- Animated background -->
   <canvas id="bgCanvas"></canvas>
 
   <header>
@@ -206,58 +213,106 @@
   <footer>© <span id="year"></span> Mugisha is'haq All Rights Reserved</footer>
 
   <script>
-    /* ---------- BACKGROUND ANIMATION ---------- */
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let blobs = [];
+    /* ---------- COLORFUL SOFTWARE DEV BACKGROUND ---------- */
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let nodes = [];
+    let mouse = { x: null, y: null };
+    let hue = 0;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      createNodes();
     }
 
-    window.addEventListener('resize', resizeCanvas);
+    function createNodes() {
+      nodes = [];
+      const total = Math.floor((canvas.width * canvas.height) / 10000);
+      for (let i = 0; i < total; i++) {
+        nodes.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          dx: (Math.random() - 0.5) * 0.6,
+          dy: (Math.random() - 0.5) * 0.6,
+          r: 1.5 + Math.random() * 1.5,
+          color: `hsl(${Math.random() * 360}, 80%, 60%)`
+        });
+      }
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("mousemove", e => { mouse.x = e.x; mouse.y = e.y; });
     resizeCanvas();
 
-    class Blob {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.radius = 100 + Math.random() * 120;
-        this.color = `hsla(${Math.random() * 360}, 80%, 60%, 0.5)`;
-        this.dx = (Math.random() - 0.5) * 0.6;
-        this.dy = (Math.random() - 0.5) * 0.6;
-      }
-      move() {
-        this.x += this.dx;
-        this.y += this.dy;
-        if (this.x < 0 || this.x > canvas.width) this.dx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.dy *= -1;
-      }
-      draw() {
+    function drawNodes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hue += 0.5;
+      nodes.forEach(n => {
         ctx.beginPath();
-        const grad = ctx.createRadialGradient(this.x, this.y, this.radius * 0.3, this.x, this.y, this.radius);
-        grad.addColorStop(0, this.color);
-        grad.addColorStop(1, 'transparent');
-        ctx.fillStyle = grad;
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.shadowColor = n.color;
+        ctx.shadowBlur = 12;
         ctx.fill();
+      });
+      connectNodes();
+      moveNodes();
+    }
+
+    function connectNodes() {
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            const opacity = 1 - dist / 120;
+            const color = `hsla(${(hue + i * 5) % 360}, 100%, 70%, ${opacity * 0.5})`;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      if (mouse.x && mouse.y) {
+        nodes.forEach(n => {
+          const dx = mouse.x - n.x;
+          const dy = mouse.y - n.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            const color = `hsla(${hue % 360}, 100%, 70%, ${1 - dist / 150})`;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+          }
+        });
       }
     }
 
-    for (let i = 0; i < 5; i++) blobs.push(new Blob());
+    function moveNodes() {
+      nodes.forEach(n => {
+        n.x += n.dx;
+        n.y += n.dy;
+        if (n.x < 0 || n.x > canvas.width) n.dx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.dy *= -1;
+      });
+    }
 
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      blobs.forEach(blob => {
-        blob.move();
-        blob.draw();
-      });
+      drawNodes();
       requestAnimationFrame(animate);
     }
     animate();
 
-    /* ---------- PRODUCT DATA & UI ---------- */
+    /* ---------- PRODUCT DATA + FUNCTIONS ---------- */
     const PRODUCTS = [
       { id: 1, title: 'Asics Sports Shoes', price: 32000, category: 'Shoes', rating: 4.5, description: 'Lightweight running shoes for comfort and speed.', image: 'images/asics.png' },
       { id: 2, title: 'Wireless Headphones', price: 75000, category: 'Electronics', rating: 4.7, description: 'High-quality over-ear headphones with rich bass.', image: 'images/headphones.png' },
@@ -288,7 +343,7 @@
         const el = document.createElement('article');
         el.className = 'product';
         el.innerHTML = `
-          <img src="${p.image}" onerror="this.src='images/placeholder.png'" alt="${p.title}">
+          <img src="${p.image}" alt="${p.title}">
           <h3>${p.title}</h3>
           <p class="muted">${p.category} • Rating: ${p.rating}</p>
           <p class="price">RWF ${p.price.toLocaleString()}</p>
